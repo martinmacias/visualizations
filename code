@@ -1,5 +1,32 @@
 # Map with inset map and with different features
 
+# Libraries
+library(pacman)
+p_load(tidyverse, 
+       sf,
+       tmap,
+       grid,
+       ggrepel)
+
+tancolor<-"tan"
+inset<-
+  ggplot()  +
+  
+  geom_sf(data=mg_2019_estados,
+        fill=tancolor,
+        col="gray10")+
+  
+  labs(x=NULL, y=NULL)+
+
+  theme_bw()+
+  
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.ticks.length = unit(0, "pt"),
+        axis.title=element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm"),
+        panel.background = element_rect(fill = "lightblue"))
+inset
 
 xmin<- -109
 xmax<- -108
