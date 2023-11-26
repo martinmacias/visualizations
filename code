@@ -1,0 +1,157 @@
+# Map with inset map and with different features
+
+
+xmin<- -109
+xmax<- -108
+ymin<- 25.4
+ymax<- 26
+
+insetPlot<-
+inset+
+  geom_rect(aes(xmin = xmin,
+                xmax = xmax,
+                ymin = ymin,
+                ymax = ymax), 
+            color = "red", 
+            fill = NA) 
+
+# Guasave. 	25011.  250110001. pop dens: 3485
+# Los Mochis. 25015. 250150001. pop dens: 3361
+guagua<-mg_2019[mg_2019$CVEGEO=="250110001"|mg_2019$CVEGEO=="250150001",]
+guagua<-st_centroid(guagua)
+guagua$NOMGEO<-c("Guasave","Guamuchil")
+guagua<-st_transform(guagua, 4326)
+guagua[,c("lon","lat")]<-st_coordinates(guagua)
+guagua
+
+
+
+
+culiacanCross<-
+  
+  #Polygons
+  crossChiSi %>% 
+  filter(CVE_ENT=='25') %>% 
+  
+  # Guasave. 	25011.  pop dens: 3485
+  # Los Mochis. 25015. pop dens: 3361
+  
+
+  #Layers:
+  ggplot() +
+  
+  # Coast line
+  geom_sf(data=limite,
+          #fill="#E5D3B3",
+          #fill="#eee2d2",
+          fill="tan",
+          col="gray")+
+
+  # Municipalities border
+  # geom_sf(data=mg_2019_mun %>%
+  #           filter(CVE_ENT=="25") %>% 
+  #           st_intersection(limite),
+  #         fill=NA,
+  #         col="black")+
+  
+  #Violence
+  geom_sf(aes(fill=total_rate_cat),
+          col=NA)+
+  scale_fill_manual(values = c("gray96", "gray85", "gray65","black"),
+                    name="Homicide Rate")+
+  
+  # Add localities labels
+  geom_sf(data=guagua)+
+  geom_text_repel(data=guagua,
+                  aes(x = lon, y = lat, label=NOMGEO),
+                  size=3,
+                  fontface="bold",
+                  col="black",
+                  nudge_x = c(-0.1,0.5), 
+                  nudge_y= c(-0.05,0.07))+
+
+  
+  guides(fill=guide_legend(override.aes = list(linetype=0)))+
+  
+  
+  # #State border
+  # geom_sf(data = mg_2019_estados %>% 
+  #           filter(CVE_ENT=="25") %>% 
+  #           st_cast(to="MULTILINESTRING"),
+  #         color="gray")+
+  
+  
+ 
+  
+  #Ports, Airports
+  # geom_sf(data = ports_airports_sinaloa,
+  #         size=3,
+  #         aes(shape=CLASE),
+  #         show.legend = "point")+
+  # 
+  #  scale_shape_manual(values=c(8, 2),
+  #                     name="")+
+  
+  #Pipelines
+  geom_sf(data=pipelines %>% 
+            filter(cve_edo=="25") %>% 
+            st_buffer(dist = 2000) %>% 
+          st_union(),
+        fill=NA,
+        col="red",
+        alpha=0.2,
+        lwd=0.6,
+        lty="dotted")+
+  
+  geom_sf(data=pipelines %>% 
+            filter(cve_edo=="25"),
+          aes(color="Oil Pipeline"),
+          show.legend = "line",
+          lwd=1)+
+  
+  scale_color_manual(values=c("gray0"),
+                     name="Strategic Resources")+
+  
+  #North and scale bar
+  ggsn::north(x.min = -108.6,
+              x.max= -108,
+              y.min = 25.4,
+              y.max = 25.7,
+              location = "topleft",
+              symbol = 10,
+              scale=0.12)+
+   
+  ggsn::scalebar(x.min = -108.6,
+              x.max=-108,
+              y.min = 25.4,
+              y.max = 25.7,
+              transform = T,
+              model="WGS84",
+              location = "bottomleft",
+              dist=10,
+              dist_unit = "km",
+              st.size =1.9)+
+  
+  #Labs
+  labs(title="Guasave-Guamuchil")+
+  xlab("")+
+  ylab("")+
+  
+  #Additionals
+   
+  coord_sf(xlim = c(-108.6, -108),
+           ylim = c(25.4, 25.7))+
+  
+  #Themes
+  theme_bw()+
+  
+  # Sea
+  theme(panel.background = element_rect(fill = "lightblue"))
+
+# culiacanCross
+# print(insetPlot, vp = viewport(x = 0.689, y = 0.659, width = 0.2, height = 0.2))
+png(filename = "mapas/2.GuasaveGuamuchil.PNG", width = 800, height = 700)
+culiacanCross
+print(insetPlot, vp = viewport(x = 0.689, y = 0.659, width = 0.2, height = 0.2))
+dev.off()
+
