@@ -182,3 +182,155 @@ culiacanCross
 print(insetPlot, vp = viewport(x = 0.689, y = 0.659, width = 0.2, height = 0.2))
 dev.off()
 
+
+
+
+
+
+
+
+
+juarezCross<-
+  
+  # Polygons
+  crossChiSi %>%
+  filter(CVE_ENT=='08') %>%
+
+  # Guasave. 	25011.  pop dens: 3485
+  # Los Mochis. 25015. pop dens: 3361
+
+
+  # Layers:
+  ggplot() +
+
+  # # Coast line
+  # geom_sf(data=limite,
+  #         fill="tan",
+  #         col="gray")+
+
+  # Municipalities border
+  geom_sf(data=m,
+          fill="tan",
+          col=NA)+
+  
+  # Countries border
+  geom_sf(data=countries,
+          fill="tan", col=NA)+
+
+
+  #Violence
+  geom_sf(aes(fill=total_rate_cat),
+          col=NA)+
+ scale_fill_manual(values = c("gray98", "gray85", "gray65","black"),
+                    name="Homicide Rate")+
+
+  # Add localities labels
+  geom_sf(data=juarezAirport)+
+  geom_text_repel(data=juarezAirport,
+                  aes(x = lon, y = lat, label=nombre),
+                  size=5,
+                  fontface="bold",
+                  col="black",
+                  nudge_x = c(-0.2,0.2),
+                  nudge_y = c(0.05,0.05))+
+  
+  geom_text(data = elPaso, aes(x = lon, y = lat, label = name), size = 5, fontface="bold") +
+
+
+  # State border
+  # geom_sf(data = mg_2019_estados %>%
+  #           filter(CVE_ENT=="08") %>%
+  #           st_cast(to="MULTILINESTRING"),
+  #         col="black")+
+  
+
+  
+
+  # Ports, Airports
+  geom_sf(data = ports_airports_chihuahua,
+          size=3,
+          aes(shape=CLASE),
+          show.legend = "point")+
+
+   scale_shape_manual(values=c(8, 2),
+                      name="Strategic Sites")+
+
+  # Pipelines
+  geom_sf(data=pipelines %>%
+            filter(cve_edo=="08") %>%
+            st_buffer(dist = 2000) %>%
+          st_union(),
+        fill=NA,
+        col="red",
+        lwd=0.8,
+        lty="dotted")+
+
+  geom_sf(data=pipelines %>%
+            filter(cve_edo=="08"),
+          aes(color="Oil Pipeline"),
+          show.legend = "line",
+          lwd=1)+
+  
+  # US border
+  geom_sf(data=us_border,
+          aes(color="US Border"),
+          show.legend = "line",
+          linetype="dashed",
+          lwd=0.5)+
+
+  # Customize line type legends
+  scale_color_manual(values=c("gray0", "gray0"),
+                     name="Strategic Resources")+
+  
+
+  # Remove lines from legend
+  guides(fill=guide_legend(order=1, override.aes = list(linetype=0, shape=NA)),
+         
+         linetype=F,
+         
+         color=guide_legend(order=2, override.aes =list(linetype=c("solid","dashed"),shape=NA, size=10)),
+         
+         shape=guide_legend(order=3, override.aes = list(linetype=NA)))+
+
+  coord_sf(xlim=c(-107,-106),
+            ylim=c(31.1,31.9))+
+  
+  # North and scale bar
+  ggsn::north(x.min = -106,
+              x.max= -107,
+              y.min = 31.1,
+              y.max = 31.9,
+              location = "topright",
+              symbol = 10,
+              scale=0.12)+
+   
+  ggsn::scalebar(x.min = -106,
+              x.max= -107,
+              y.min = 31.1,
+              y.max = 31.9,
+              model="WGS84",
+              location = "bottomright",
+              dist=10,
+              dist_unit = "km",
+              st.size =3,
+              transform = T)+
+  
+  #Themes
+  theme_bw()+
+
+  # Sea
+  theme(panel.background = element_rect(fill = "lightblue"),
+        legend.text = element_text(size = 15),
+        legend.title = element_text(size = 15))+
+  
+  #Labs
+  labs(title = "Juarez",
+       x="",
+       y="")
+
+png(filename = "mapas/4.Juarez.PNG", width = 1000, height = 1000)
+juarezCross
+print(insetPlot, vp = viewport(x = 0.22, y = 0.27, width = 0.3, height = 0.4))
+dev.off()
+
+
