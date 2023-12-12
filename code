@@ -25,7 +25,8 @@ inset<-
         axis.ticks.length = unit(0, "pt"),
         axis.title=element_blank(),
         plot.margin = margin(0, 0, 0, 0, "cm"),
-        panel.background = element_rect(fill = "lightblue"))
+        panel.background = element_rect(fill = "lightblue"),
+        panel.border = element_rect(colour = "black", linewidth = 2))
 inset
 
 xmin<- -109
